@@ -1,3 +1,28 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <pwd.h>
+#include <grp.h>
+
+
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
+void remove_newline(char *str) {
+    size_t len = strlen(str);
+    if (len > 0 && str[len - 1] == '\n') {
+        str[len - 1] = '\0';
+    }
+}
+
+
 int ls(char **commands) {
     int show_hidden = 0;
     int long_format = 0;
@@ -12,6 +37,7 @@ int ls(char **commands) {
             directory = commands[i];
         }
     }
+
 
     DIR *dir = opendir(directory);
     if (!dir) {
@@ -50,7 +76,7 @@ int ls(char **commands) {
                 printf(" %s", mod_time_str);
 
             }
-                printf(ANSI_COLOR_GREEN "  %s" ANSI_COLOR_RESET , entry->d_name);
+                printf(ANSI_COLOR_GREEN "  %s\n" ANSI_COLOR_RESET , entry->d_name);
 
         } else {
             perror("stat ERROR");
@@ -59,4 +85,12 @@ int ls(char **commands) {
     printf("\n");
     closedir(dir);
     return 1;
+}
+
+
+int main(int argc,char **commands){
+
+    ls(commands);
+
+return 1;
 }
