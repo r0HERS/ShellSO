@@ -98,10 +98,56 @@ int shell_exit(char **commands) {
 }
 
 int shell_path(char **commands) {
-    int i = 0;
 
-
+    if (commands[1] == NULL) {
+        printf("Current path directories:\n");
+        for (int i = 0; i < num_path_dirs; i++) {
+            printf("    %s\n", path_dirs[i]);
+        }
+    } else {
+        for (int i = 1; commands[i] != NULL; i++) {
+            if (num_path_dirs < MAX_PATH_DIRS - 1) {
+                path_dirs[num_path_dirs++] = strdup(commands[i]);
+            } else {
+                fprintf(stderr, "Max path directories exceeded\n");
+                break;
+            }
+        }
+    }
+    return 1;
 }
+
+/*char *find_executable(const char *commands, int start) {
+    char *full_path = NULL;
+
+    // Percorre todos os diretórios em path_dirs
+    for (int i = 0; i < num_path_dirs; i++) {
+        // Tamanho necessário para alocar espaço para o caminho completo
+        size_t path_len = strlen(path_dirs[i]) + strlen(commands(start)) + 2;  // +2 para '/' e '\0'
+        char *path_exec = (char *)malloc(path_len);
+
+        if (path_exec == NULL) {
+            perror("Memory allocation error");
+            continue;
+        }
+
+        // Constrói o caminho completo para o executável
+        snprintf(path_exec, path_len, "%s/%s", path_dirs[i], executable);
+
+        // Verifica se o executável existe nesse caminho
+        if (access(path_exec, X_OK) == 0) {
+            // Executável encontrado, retorna o caminho completo
+            full_path = path_exec;
+            break;
+        }
+
+        // Liberar a memória alocada para o caminho temporário
+        free(path_exec);
+    }
+
+    return full_path;
+}*/
+
 
 void *read_input() {
     int BUFFER_SIZE = LSH_RL_BUFFER;
@@ -167,43 +213,7 @@ char **split_input(char *input) {
     return tokens;
 }
 
-/*void cat_redirect(char **commands){
-
-    pid_t pid, wpid;
-    int status;
-    int redirect_output = 0;
-    char *output_filename = NULL;
-
-     redirect_output = 1;
-     output_filename = commands[3];
-     commands[2] = NULL;
-
-     if (pid == 0) {
-        if (redirect_output) {
-
-            FILE *output_file = fopen(output_filename, "w");
-            if (output_file == NULL) {
-                perror("Erro ao abrir o arquivo de saída");
-                exit(EXIT_FAILURE);
-            }
-            dup2(fileno(output_file), STDOUT_FILENO);
-            fclose(output_file);
-        }
-
-        if (execvp(commands[0], commands) == -1) {
-            perror("Erro na execução do comando");
-            exit(EXIT_FAILURE);
-        }
-    } else if (pid < 0) {
-        perror("Erro no fork");
-    } else {
-        do {
-            wpid = waitpid(pid, &status, WUNTRACED);
-        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-    }
-}*/
-
-int launch_comand(char **commands) {
+int launch_comand(char **commands,int start) {
     pid_t pid, wpid;
     int status;
 
@@ -211,20 +221,18 @@ int launch_comand(char **commands) {
 
     if (pid == 0) {
 
+        if(strcmp(commands[start],"ls") == 0 ){
 
-
-        if(strcmp(commands[0],"ls") == 0 ){
-
-            if (execl("./ls","ls",commands[1],commands[2],NULL) == -1) {
+            if (execl("./ls","ls",commands[start+1],commands[start+2],NULL) == -1) {
                 perror("Execvp execution ERROR");
                 exit(EXIT_FAILURE);
             }
 
         }
 
-        if(strcmp(commands[0],"cat") == 0 ){
+        if(strcmp(commands[start],"cat") == 0 ){
 
-            if (execl("./cat","cat",commands[1],commands[2],commands[3],NULL) == -1) {
+            if (execl("./cat","cat",commands[start+1],commands[start+2],commands[start+3],NULL) == -1) {
                 perror("Execvp execution ERROR");
                 exit(EXIT_FAILURE);
             }
@@ -243,9 +251,47 @@ int launch_comand(char **commands) {
 }
 
 int exec_comand(char **commands) {
+
+    int parallel = 0;
+    int i = 0;
+    int start = 0;
+    int end = 0;
+
     if (commands[0] == NULL) {
         return 1;
     }
+
+    while (commands[i] != NULL) {
+        if (strcmp(commands[i], "&") == 0) {
+            parallel = 1;
+            break;
+        }
+        i++;
+    }
+
+    if (parallel==1) {
+        while (commands[end] != NULL) {
+            if (strcmp(commands[end], "&") == 0) {
+                commands[end] = NULL;
+                pid_t pid = fork();
+
+                if (pid == 0) {
+                    for (int i = 0; i < num_builtins(); i++) {
+                        if (strcmp(commands[start], builtin_str[i]) == 0) {
+                            return (*builtin_fun[i])(commands);
+                            }
+                    }
+
+                    launch_comand(commands,start);
+                    exit(EXIT_FAILURE);
+                } else if (pid < 0) {
+                    perror("fork ERROR");
+                }
+                start = end + 1;
+            }
+            end++;
+        }
+        }
 
     for (int i = 0; i < num_builtins(); i++) {
         if (strcmp(commands[0], builtin_str[i]) == 0) {
@@ -253,14 +299,15 @@ int exec_comand(char **commands) {
         }
     }
 
-    return launch_comand(commands);
+    return launch_comand(commands,start);
 }
+
 
 void text() {
     char cwd[1024];
 
     getcwd(cwd, sizeof(cwd));
-    printf("%s > ", cwd);
+    printf("\n%s > ", cwd);
 }
 
 int main(int argc, char **argv) {

@@ -73,9 +73,9 @@ int cat(char **commands) {
     while ((ch = fgetc(file)) != EOF) {
         putchar(ch);
     }
-
+    printf("\n\n");
     fclose(file);
-    print("\n\n");
+
     return 1;
 }
 
@@ -83,6 +83,6 @@ int cat(char **commands) {
 int main(int argc,char **commands){
 
     cat(commands);
-
+    printf("\n\n");
 return 0;
 }
