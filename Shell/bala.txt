@@ -1,1 +1,1 @@
-/Users/PC_Gamer/ShellSO/Shell
+path /home/renarohers/Shell
