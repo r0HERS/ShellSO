@@ -31,18 +31,27 @@ Siga os passos abaixo para compilar e executar o projeto:
 
 1. **Clone o repositório**:
     ```sh
-    git clone <URL_DO_REPOSITORIO>
-    cd <NOME_DO_REPOSITORIO>
+    git clone "https://github.com/r0HERS/ShellSO.git"
+    cd "ShellSO"
     ```
 
 2. **Compile o código-fonte**:
     ```sh
-    gcc -o shell main.c ls.c cat.c
+    gcc -c main.c
+    gcc -o main main.o
+    ```
+    ```sh
+    gcc -c ls.c
+    gcc -o ls ls.o
+    ```
+    ```sh
+    gcc -c cat.c
+    gcc -o cat cat.o
     ```
 
 3. **Execute o shell**:
     ```sh
-    ./shell
+    ./main
     ```
 
 ## Detalhes da Implementação
@@ -78,28 +87,11 @@ Define ou exibe os caminhos para busca de executáveis.
 
 Funções Externas
 
-ls
+ls e derivados
 O comando ls lista o conteúdo de um diretório. Está implementado no arquivo ls.c.
 
-cat
+cat e derivados
 O comando cat exibe o conteúdo de arquivos. Está implementado no arquivo cat.c.
 
-Configuração de Localidade
-O projeto está configurado para suportar caracteres acentuados. No início da função main, a localidade é configurada para UTF-8:
-
-setlocale(LC_ALL, "en_US.UTF-8");
-Como Contribuir
-Se você deseja contribuir para este projeto, siga os passos abaixo:
-
-Fork o repositório.
-Crie um branch para suas modificações (git checkout -b minha-nova-funcionalidade).
-Commit suas mudanças (git commit -am 'Adiciona nova funcionalidade').
-Push para o branch (git push origin minha-nova-funcionalidade).
-Crie um novo Pull Request.
-Licença
-Este projeto está licenciado sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
-
 Agradecimentos
-Agradecemos ao professor da disciplina de Sistemas Operacionais por fornecer a base e o apoio necessários para a realização deste projeto.
-
-Substitua `<URL_DO_REPOSITORIO>` pelo URL real do seu repositório no GitHub e `<NOME_DO_REPOSITORIO
+Agradecemos ao professor Isaías Bittencourt Felzmann de Sistemas Operacionais por fornecer a base e o apoio necessários para a realização deste projeto.
