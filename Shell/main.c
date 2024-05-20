@@ -10,6 +10,14 @@
 #include <time.h>
 #include <pwd.h>
 #include <grp.h>
+#include <locale.h>
+
+#define ANSI_COLOR_RESET "\x1b[0m"
+#define ANSI_COLOR_RED "\x1b[31m"
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_BLUE "\x1b[34m"
+#define ANSI_COLOR_CYAN "\x1b[36m"
 
 #define LSH_RL_BUFFER 1024
 #define LSH_TOK_BUFFERSIZE 64
@@ -42,16 +50,9 @@ int num_builtins() {
     return sizeof(builtin_str) / sizeof(char *);
 }
 
-void remove_newline(char *str) {
-    size_t len = strlen(str);
-    if (len > 0 && str[len - 1] == '\n') {
-        str[len - 1] = '\0';
-    }
-}
-
 int cd(char **commands) {
     if (commands[1] == NULL) {
-        fprintf(stderr, "\nSem argumento, esperado: \"cd <folder> \n");
+        fprintf(stderr, "\nSem argumento, esperado: \"cd <pasta> \n");
     } else {
         if (chdir(commands[1]) != 0) {
             int found = 0;
@@ -64,7 +65,7 @@ int cd(char **commands) {
                 }
             }
             if (!found) {
-                perror("cd ERROR");
+                perror("cd ERROR ao buscar pasta");
             }
         }
     }
@@ -72,10 +73,35 @@ int cd(char **commands) {
 }
 
 int help(char **commands) {
-    printf("Programa Shell SO\nFunctions:\n");
+    setlocale(LC_ALL, "pt_BR.UTF-8");
+
+    printf(ANSI_COLOR_GREEN "Programa Shell SO\n" ANSI_COLOR_RESET);
+
+    printf(ANSI_COLOR_CYAN "Built-in Functions:\n" ANSI_COLOR_RESET);
     for (int i = 0; i < num_builtins(); i++) {
-        printf("    - %s\n", builtin_str[i]);
+        printf(ANSI_COLOR_CYAN "    - %s\n" ANSI_COLOR_RESET, builtin_str[i]);
     }
+
+    printf(ANSI_COLOR_YELLOW "\nEste trabalho foi feito pelo grupo 8:\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_YELLOW "Renan Rohers\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_YELLOW "Tiago Dallécio\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_YELLOW "Kauai Duhamel\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_YELLOW "Luis Guilherme\n" ANSI_COLOR_RESET);
+
+    printf(ANSI_COLOR_RED "\nNosso programa conta com uma busca em PATH,\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_RED "que deve ser definido pelo usuário:\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_RED "path /xxxx/xxxxx/xxxx\n" ANSI_COLOR_RESET);
+
+    printf(ANSI_COLOR_GREEN "\nEm nosso repositório no GitHub, é possível encontrar materiais de teste,\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_GREEN "deste programa assim como as funções externas ls e cat,\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_GREEN "que estão de acordo com as especificações deste projeto\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_GREEN "possuindo todas as suas variantes pedidas:\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE "- ls\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE "- ls -a\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE "- ls -l\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE "- cat\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE "- cat saida > entrada\n" ANSI_COLOR_RESET);
+
     return 1;
 }
 
@@ -96,7 +122,7 @@ int shell_path(char **commands) {
             if (num_path_dirs < MAX_PATH_DIRS - 1) {
                 path_dirs[num_path_dirs++] = strdup(commands[i]);
             } else {
-                fprintf(stderr, "Maximo numero de paths excedido\n");
+                fprintf(stderr, "Máximo número de paths excedido\n");
                 break;
             }
         }
@@ -112,7 +138,7 @@ char *find_executable(const char *executable) {
         char *path_exec = (char *)malloc(path_len);
 
         if (path_exec == NULL) {
-            perror("Alocaçao de  memoria ERROR");
+            perror("Alocação de memória ERROR");
             continue;
         }
 
@@ -138,7 +164,7 @@ void *read_input() {
     int c;
 
     if (!buffer) {
-        fprintf(stderr, "Alocaçao do buffer ERROR\n");
+        fprintf(stderr, "Alocação do buffer ERROR\n");
         return NULL;
     }
 
@@ -157,7 +183,7 @@ void *read_input() {
             BUFFER_SIZE += LSH_RL_BUFFER;
             buffer = realloc(buffer, BUFFER_SIZE);
             if (!buffer) {
-                fprintf(stderr, "Realocaçao de buffer ERROR\n");
+                fprintf(stderr, "Realocação de buffer ERROR\n");
                 return NULL;
             }
         }
@@ -171,7 +197,7 @@ char **split_input(char *input) {
     char *token;
 
     if (!tokens) {
-        fprintf(stderr, "Tokens alocaçao ERROR\n");
+        fprintf(stderr, "Tokens alocação ERROR\n");
         return NULL;
     }
 
@@ -185,7 +211,7 @@ char **split_input(char *input) {
             BUFFER_SIZE += LSH_TOK_BUFFERSIZE;
             tokens = realloc(tokens, BUFFER_SIZE * sizeof(char *));
             if (!tokens) {
-                fprintf(stderr, "Tokens realocaçao ERROR\n");
+                fprintf(stderr, "Tokens realocação ERROR\n");
                 return NULL;
             }
         }
@@ -199,12 +225,12 @@ int launch_command(char **commands, int start) {
     char *executable = find_executable(commands[start]);
 
     if (executable == NULL) {
-        fprintf(stderr, "Executavel não encontrado\n");
+        fprintf(stderr, "Executável não encontrado\n");
         return 1;
     }
 
     if (execl(executable, commands[start], commands[start + 1], commands[start + 2], commands[start + 3], NULL) == -1) {
-        perror("Execl exucuçao ERROR");
+        perror("Execl execução ERROR");
         return 1;
     }
 
@@ -296,6 +322,9 @@ void text() {
 }
 
 int main(int argc, char **argv) {
+
+    setlocale(LC_ALL, "pt_BR.UTF-8");
+
     char *input;
     char **commands;
     int status;

@@ -26,22 +26,28 @@ void remove_newline(char *str) {
 int ls(char **commands) {
     int show_hidden = 0;
     int long_format = 0;
+    int i;
     char *directory = ".";
 
-    for (int i = 1; commands[i] != NULL; i++) {
+    for (i = 1; commands[i] != NULL; i++) {
         if (strcmp(commands[i], "-a") == 0) {
             show_hidden = 1;
         } else if (strcmp(commands[i], "-l") == 0) {
             long_format = 1;
+        } else if (strcmp(commands[i], "-la") == 0) {
+            long_format = 1;
+            show_hidden = 1;
+        } else if (strcmp(commands[i], "-al") == 0) {
+            long_format = 1;
+            show_hidden = 1;
         } else {
             directory = commands[i];
         }
     }
 
-
     DIR *dir = opendir(directory);
     if (!dir) {
-        perror("ls ERROR");
+        perror("ERROR ao abrir o diretorio.");
         return 1;
     }
 
