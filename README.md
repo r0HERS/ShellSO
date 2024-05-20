@@ -24,6 +24,53 @@ Para compilar e executar este projeto, você precisará de:
 - Um sistema operacional Linux.
 - Compilador GCC.
 - Acesso à linha de comando.
+- Oracle VM VirtualBox com o Ubuntu Server 22.04.3 LTS instalado como máquina virtual.
+
+## Configuração da Máquina Virtual e Pasta Compartilhada
+
+### Parte I – Configuração e Instalação da Máquina Virtual
+
+1. **Baixe a imagem do Ubuntu Server 22.04.3 LTS**:
+   - [Download do Ubuntu Server](https://ubuntu.com/download/server)
+   - Se estiver usando uma máquina do laboratório, acesse `\\hub\ACADEMICO\007-PROFs\Isaías-SO` pela rede interna para um download mais ágil.
+
+2. **Instale o VirtualBox e o Extension Pack**:
+   - [Download do VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+
+3. **Crie uma nova máquina virtual**:
+   - Abra o VirtualBox e clique em "Novo".
+   - Preencha o nome da VM e selecione a imagem ISO do Ubuntu baixada no passo 1.
+   - Mantenha as configurações padrão para memória e armazenamento.
+
+4. **Configuração de Rede**:
+   - Vá em "Configurações" da VM > "Rede" > "Avançado" > "Redirecionamento de Portas".
+   - Adicione uma nova regra com:
+     - Endereço IP do Hospedeiro: 127.0.0.1
+     - Porta do Hospedeiro: 2222
+     - Porta do Convidado: 22
+
+5. **Instalação do Ubuntu**:
+   - Inicie a VM e siga as instruções para instalar o Ubuntu Server.
+   - Selecione o idioma Português e continue com as configurações padrão.
+   - Crie um usuário e senha conforme solicitado durante a instalação.
+
+### Parte II – Configuração da Pasta Compartilhada
+
+1. **Crie uma pasta compartilhada no sistema hospedeiro**:
+   - No VirtualBox, vá em "Dispositivos" > "Pastas Compartilhadas" > "Configurações de Pastas Compartilhadas".
+   - Adicione uma nova pasta compartilhada apontando para uma pasta no sistema hospedeiro (por exemplo, `C:\PUC-SO\Labs`).
+   - Nomeie o compartilhamento como `labs`.
+
+2. **Monte a pasta compartilhada na VM**:
+   - No terminal do hospedeiro, conecte-se à VM via SSH:
+     ```sh
+     ssh <usuário>@127.0.0.1 -p 2222
+     ```
+   - Na VM, crie um diretório e monte a pasta compartilhada:
+     ```sh
+     mkdir labs
+     sudo mount -t vboxsf labs labs/
+     ```
 
 ## Instruções de Compilação e Execução
 
