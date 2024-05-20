@@ -111,9 +111,9 @@ Siga os passos abaixo para compilar e executar o projeto:
 
 ### Funções Embutidas
 
-#### `cd`
-
 ```c
+cd
+
 int cd(char **commands);
 Muda o diretório atual para o especificado em commands[1].
 
