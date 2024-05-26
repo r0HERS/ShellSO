@@ -17,6 +17,7 @@ Este trabalho foi desenvolvido pelo grupo 8:
 - `exit`: Sai do shell.
 - `path <caminho>`: Define os caminhos para busca de executáveis.
 - Comandos externos como `ls` e `cat`.
+- Execução de arquivos batch que contém uma lista de comandos a serem executados sequencialmente.
 
 ## Pré-requisitos
 
@@ -101,6 +102,27 @@ Siga os passos abaixo para compilar e executar o projeto:
     ./main
     ```
 
+### Execução de Arquivos Batch
+
+Para executar um arquivo batch contendo uma lista de comandos:
+
+1. **Crie ou edite seu arquivo batch**:
+    - Certifique-se de que o arquivo batch esteja no mesmo diretório que o executável `main`.
+    - O arquivo batch deve conter uma lista de comandos, um por linha.
+
+    Exemplo de um arquivo batch (`comandos_batch.batch`):
+    ```sh
+    path /bin /usr/bin
+    cd /home
+    ls -l
+    cat /etc/passwd
+    ```
+
+2. **Execute o arquivo batch**:
+    ```sh
+    ./main comandos_batch.batch
+    ```
+
 ## Detalhes da Implementação
 
 ### Estrutura do Código
@@ -139,6 +161,7 @@ O comando ls lista o conteúdo de um diretório. Está implementado no arquivo l
 
 cat e derivados
 O comando cat exibe o conteúdo de arquivos. Está implementado no arquivo cat.c.
+```
 
 Agradecimentos
 Agradecemos ao professor Isaías Bittencourt Felzmann de Sistemas Operacionais por fornecer a base e o apoio necessários para a realização deste projeto.
