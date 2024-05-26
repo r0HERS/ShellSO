@@ -161,6 +161,7 @@ O comando ls lista o conteúdo de um diretório. Está implementado no arquivo l
 
 cat e derivados
 O comando cat exibe o conteúdo de arquivos. Está implementado no arquivo cat.c.
+```
 
 Agradecimentos
 Agradecemos ao professor Isaías Bittencourt Felzmann de Sistemas Operacionais por fornecer a base e o apoio necessários para a realização deste projeto.
