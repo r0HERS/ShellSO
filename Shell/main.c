@@ -314,6 +314,32 @@ int exec_command(char **commands) {
     return 1;
 }
 
+int batch(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("Erro ao abrir arquivo batch");
+        return 1;
+    }
+
+    char line[LSH_RL_BUFFER];
+    char **commands;
+    int status;
+
+    while (fgets(line, sizeof(line), file)) {
+        printf("%s", line);
+        commands = split_input(line);
+        status = exec_command(commands);
+
+        free(commands);
+
+        if (status == 0) {
+            break;
+        }
+    }
+
+    fclose(file);
+}
+
 void text() {
     char cwd[1024];
 
@@ -328,6 +354,11 @@ int main(int argc, char **argv) {
     char *input;
     char **commands;
     int status;
+
+    if (argc == 2) {
+        batch(argv[1]);
+        return 0;
+    }
 
     do {
         text();
