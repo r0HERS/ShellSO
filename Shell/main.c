@@ -108,6 +108,7 @@ int help(char **commands) {
 int shell_exit(char **commands) {
     fflush(stdin);
     fflush(stdout);
+    kill(0, SIGTERM);
     return 0;
 }
 
@@ -134,7 +135,7 @@ char *find_executable(const char *executable) {
     char *full_path = NULL;
 
     for (int i = 0; i < num_path_dirs; i++) {
-        size_t path_len = strlen(path_dirs[i]) + strlen(executable) + 2;  // +2 for '/' and '\0'
+        size_t path_len = strlen(path_dirs[i]) + strlen(executable) + 2;
         char *path_exec = (char *)malloc(path_len);
 
         if (path_exec == NULL) {
